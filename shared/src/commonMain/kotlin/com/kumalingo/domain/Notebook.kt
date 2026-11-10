@@ -50,9 +50,11 @@ data class Notebook(val folders: List<Folder> = emptyList(), val notes: List<Not
 
     fun search(query: String): List<Note> {
         val normalized = normalizeSearch(query)
+        val plain = normalizeSearch(query, stripToneNumbers = false)
         val visibleIds = folders.filter(::isVisible).map { it.id }.toSet()
         return notes.filter { note -> note.folderId in visibleIds &&
-            listOf(note.hanzi, note.pinyin, note.rawPinyin, note.translation).any { normalizeSearch(it).contains(normalized) }
+            (listOf(note.hanzi, note.translation).any { normalizeSearch(it, stripToneNumbers = false).contains(plain) } ||
+                listOf(note.pinyin, note.rawPinyin).any { normalizeSearch(it).contains(normalized) })
         }.sortedWith(compareBy({ breadcrumb(it.folderId) }, Note::sortKey, Note::id))
     }
 
@@ -66,12 +68,12 @@ data class Notebook(val folders: List<Folder> = emptyList(), val notes: List<Not
 }
 
 // Shared and deterministic on Wasm/native: no java.text or JavaScript handles.
-fun normalizeSearch(value: String): String {
+fun normalizeSearch(value: String, stripToneNumbers: Boolean = true): String {
     val toneGroups = listOf("aāáǎà", "eēéěè", "iīíǐì", "oōóǒò", "uūúǔù", "vüǖǘǚǜ")
     val text = value.lowercase().replace("u:", "v").replace("u\u0308", "v").trim()
     return buildString {
         for ((index, character) in text.withIndex()) {
-            if (character in '1'..'5' && index > 0 && (text[index - 1] in 'a'..'z' || toneGroups.any { text[index - 1] in it })) continue
+            if (stripToneNumbers && character in '1'..'5' && index > 0 && (text[index - 1] in 'a'..'z' || toneGroups.any { text[index - 1] in it })) continue
             if (character in '\u0300'..'\u036f' || character.isWhitespace() || character == '\'') continue
             append(toneGroups.firstOrNull { character in it }?.first() ?: character)
         }

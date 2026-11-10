@@ -39,4 +39,10 @@ class NotebookTest {
         assertFailsWith<IllegalArgumentException> { validateNote("", "ni", "Halo") }
         assertFailsWith<IllegalArgumentException> { validateNote("你", "ni", "x".repeat(2001)) }
     }
+    @Test fun numericTranslationKeywordsAreNotMistakenForPinyinTones() {
+        val numbered = notebook.copy(notes = listOf(notebook.notes.first().copy(translation = "Pelajaran2025, HSK5")))
+        assertEquals("hello", numbered.search("2025").single().id)
+        assertEquals("hello", numbered.search("HSK5").single().id)
+        assertEquals("hello", numbered.search("ni3hao3").single().id)
+    }
 }
