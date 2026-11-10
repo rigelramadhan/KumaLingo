@@ -35,7 +35,7 @@ export class FirestoreStore implements Store {
   }
   async request(suffix: string, method = 'POST', body?: unknown, notFound = false): Promise<any> {
     const response = await fetch(`${this.database}/${suffix}`, { method, headers: { Authorization: `Bearer ${await serviceAccessToken(this.env)}`, 'Content-Type': 'application/json' }, body: body === undefined ? undefined : JSON.stringify(body) });
-    if (notFound && response.status === 404) return null;
+    if (notFound && response.status === 404) { await response.arrayBuffer(); return null; }
     if (!response.ok) {
       // Never return upstream bodies (which may include project/private request data).
       const details = await response.json().catch(() => null) as { error?: { status?: string } } | null;
@@ -55,8 +55,11 @@ export class FirestoreStore implements Store {
       const writes: unknown[] = [];
       const tx: Transaction = {
         get: async (path) => {
-          const result = await this.request(`documents/${path.split('/').map(encodeURIComponent).join('/')}?transaction=${encodeURIComponent(transaction)}`, 'GET', undefined, true);
-          return result ? unpack(result.fields ?? {}) : null;
+          const name = `${this.database.replace('https://firestore.googleapis.com/v1/', '')}/documents/${path}`;
+          // batchGet keeps transaction bytes in JSON (also supported by the emulator).
+          const result = await this.request('documents:batchGet', 'POST', { documents: [name], transaction });
+          const found = result.find((item: any) => item.found)?.found;
+          return found ? unpack(found.fields ?? {}) : null;
         },
         query: async (query: Query) => {
           const parts = query.collection.split('/');

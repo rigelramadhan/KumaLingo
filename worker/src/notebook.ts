@@ -106,11 +106,13 @@ export class NotebookService {
   async moveNote(body: Document): Promise<Document> {
     const beforeId = body.beforeId ? id(body.beforeId) : null;
     return this.mutate(async (tx) => {
-      const note = await this.note(tx, body.id);
+      const note = await tx.get(`${this.base}/notes/${id(body.id)}`);
+      if (!note) throw new ApiError(404, 'not-found', 'This note no longer exists.');
       this.revision(note, body.revision);
       const folder = await this.folder(tx, note.folderId);
       if (beforeId === note.id) return { id: note.id };
-      const before = beforeId ? await this.note(tx, beforeId) : null;
+      const before = beforeId ? await tx.get(`${this.base}/notes/${beforeId}`) : null;
+      if (beforeId && !before) throw new ApiError(404, 'not-found', 'The target note no longer exists.');
       if (before && before.folderId !== note.folderId) throw new ApiError(400, 'invalid-input', 'Move notes within the same chapter.');
       const previous = (await tx.query({ collection: `${this.base}/notes`, filters: [{ field: 'folderId', op: 'EQUAL', value: note.folderId }, ...(before ? [{ field: 'sortKey', op: 'LESS_THAN' as const, value: before.sortKey }] : [])], orderBy: { field: 'sortKey', descending: true }, limit: 2 })).find((candidate) => candidate.id !== note.id);
       tx.set(`${this.base}/notes/${note.id}`, { ...note, sortKey: generateKeyBetween(previous?.sortKey as string ?? null, before?.sortKey as string ?? null), revision: Number(note.revision) + 1, updatedAt: new Date().toISOString() });

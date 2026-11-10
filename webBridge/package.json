@@ -9,7 +9,7 @@
     "src/*.mjs"
   ],
   "scripts": {
-    "test:rules": "node --test test/firestore-rules.test.mjs",
+    "test:rules": "node --experimental-strip-types --test --test-concurrency=1 test/firestore-rules.test.mjs test/firestore-rest.test.mjs",
     "test:exports": "node --test test/export.test.mjs",
     "test:browser": "playwright test --config playwright.config.mjs",
     "test:runtime": "node --experimental-test-module-mocks --test test/runtime.test.mjs test/config.test.mjs"

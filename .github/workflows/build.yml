@@ -17,6 +17,7 @@ jobs:
         with:
           node-version: '24'
       - run: npm --prefix webBridge ci --ignore-scripts
+      - run: npm --prefix worker ci --ignore-scripts
       - run: npm --prefix webBridge run test:exports
       - run: npm --prefix webBridge run test:runtime
       - run: ./gradlew :shared:jvmTest :composeApp:wasmJsBrowserDistribution --no-daemon
