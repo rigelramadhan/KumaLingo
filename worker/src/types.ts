@@ -5,6 +5,7 @@ export interface Env {
   GEMINI_MODEL: string;
   GEMINI_API_KEY?: string;
   FIREBASE_SERVICE_ACCOUNT_JSON?: string;
+  AI_PROJECT_DAILY_LIMIT?: string;
 }
 export interface Identity { uid: string; email: string }
 export type Document = Record<string, unknown>;

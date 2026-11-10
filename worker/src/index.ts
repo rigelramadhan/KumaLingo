@@ -3,6 +3,7 @@ import { FirestoreStore } from './firestore.ts';
 import { ApiError } from './types.ts';
 import type { Env, Identity, Store } from './types.ts';
 import { NotebookService } from './notebook.ts';
+import { translate } from './translation.ts';
 
 export interface Dependencies {
   store?: (env: Env) => Store;
@@ -62,6 +63,7 @@ export function createHandler(dependencies: Dependencies = {}) {
       const identity = await (dependencies.session ?? verifySession)(authorization.slice(7), env);
       await checkAccess(store, identity.email);
       if (request.method === 'GET' && path === '/session') return respond({ uid: identity.uid, email: identity.email });
+      if (request.method === 'POST' && path === '/translate') return respond(await translate(await readBody(request), identity, store, env));
       if (request.method === 'POST' && path.startsWith('/notebook/')) {
         const service = new NotebookService(store, identity);
         const actions: Record<string, (body: Record<string, unknown>) => Promise<unknown>> = {
