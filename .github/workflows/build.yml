@@ -18,7 +18,11 @@ jobs:
           node-version: '24'
       - run: npm --prefix webBridge ci --ignore-scripts
       - run: npm --prefix webBridge run test:exports
+      - run: npm --prefix webBridge run test:runtime
       - run: ./gradlew :shared:jvmTest :composeApp:wasmJsBrowserDistribution --no-daemon
+      - run: npx playwright install --with-deps chromium
+        working-directory: webBridge
+      - run: npm --prefix webBridge run test:browser
       - run: npx --yes firebase-tools@15.35.0 emulators:exec --project demo-kumalingo --only firestore "npm --prefix webBridge run test:rules"
   worker:
     runs-on: ubuntu-latest

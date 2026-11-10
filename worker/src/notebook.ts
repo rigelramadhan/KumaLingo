@@ -63,7 +63,7 @@ export class NotebookService {
   async createNote(body: Document): Promise<Document> {
     const noteId = id(body.requestId);
     const folderId = id(body.folderId);
-    const values = { hanzi: text(body.hanzi, 200), pinyin: text(body.pinyin, 500), translation: text(body.translation, 2000), rawPinyin: text(body.rawPinyin ?? body.pinyin, 500), aiTranslation: text(body.aiTranslation ?? body.translation, 2000) };
+    const values = { hanzi: text(body.hanzi, 200), pinyin: text(body.pinyin, 500), translation: text(body.translation, 2000), rawPinyin: text(body.rawPinyin ?? body.pinyin, 500), aiTranslation: body.aiTranslation === '' ? '' : text(body.aiTranslation ?? body.translation, 2000) };
     const input = JSON.stringify([folderId, values]);
     return this.mutate(async (tx) => {
       if (await this.receipt(tx, noteId, 'note', input)) return { id: noteId };

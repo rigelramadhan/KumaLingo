@@ -1,6 +1,7 @@
 import { getApp, getApps, initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
+export { startRuntime, dispatchCommand } from './runtime.mjs';
 
 const appName = 'kumalingo';
 const allowedFields = new Set([

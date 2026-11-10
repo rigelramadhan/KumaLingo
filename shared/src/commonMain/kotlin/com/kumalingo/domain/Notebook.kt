@@ -68,10 +68,11 @@ data class Notebook(val folders: List<Folder> = emptyList(), val notes: List<Not
 // Shared and deterministic on Wasm/native: no java.text or JavaScript handles.
 fun normalizeSearch(value: String): String {
     val toneGroups = listOf("aāáǎà", "eēéěè", "iīíǐì", "oōóǒò", "uūúǔù", "vüǖǘǚǜ")
-    val text = value.lowercase().replace("u:", "v").trim()
+    val text = value.lowercase().replace("u:", "v").replace("u\u0308", "v").trim()
     return buildString {
-        for (character in text) {
-            if (character in '1'..'5' || character in '\u0300'..'\u036f') continue
+        for ((index, character) in text.withIndex()) {
+            if (character in '1'..'5' && index > 0 && (text[index - 1] in 'a'..'z' || toneGroups.any { text[index - 1] in it })) continue
+            if (character in '\u0300'..'\u036f' || character.isWhitespace() || character == '\'') continue
             append(toneGroups.firstOrNull { character in it }?.first() ?: character)
         }
     }

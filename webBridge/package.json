@@ -10,7 +10,9 @@
   ],
   "scripts": {
     "test:rules": "node --test test/firestore-rules.test.mjs",
-    "test:exports": "node --test test/export.test.mjs"
+    "test:exports": "node --test test/export.test.mjs",
+    "test:browser": "playwright test --config playwright.config.mjs",
+    "test:runtime": "node --experimental-test-module-mocks --test test/runtime.test.mjs"
   },
   "dependencies": {
     "@pdf-lib/fontkit": "1.1.1",
@@ -18,6 +20,7 @@
     "pdf-lib": "1.17.1"
   },
   "devDependencies": {
-    "@firebase/rules-unit-testing": "6.0.0"
+    "@firebase/rules-unit-testing": "6.0.0",
+    "@playwright/test": "1.65.0"
   }
 }

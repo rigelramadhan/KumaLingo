@@ -75,3 +75,9 @@ test('revocation is checked inside every write transaction', async () => {
   store.documents.set('access/student@example.invalid', { enabled: false });
   await assert.rejects(() => service.createFolder({ requestId: 'blocked', title: 'Blocked' }));
 });
+test('manual notes do not mislabel a user-entered meaning as an AI suggestion', async () => {
+  const { store, service, base } = setup();
+  await service.createFolder({ requestId: 'root', title: 'Root' });
+  await service.createNote({ requestId: 'manual', folderId: 'root', hanzi: '你', pinyin: 'nǐ', translation: 'Kamu', aiTranslation: '' });
+  assert.equal((await store.get(`${base}/notes/manual`))?.aiTranslation, '');
+});

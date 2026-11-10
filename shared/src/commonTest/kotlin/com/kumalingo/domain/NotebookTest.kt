@@ -13,6 +13,7 @@ class NotebookTest {
 
     @Test fun searchCoversAllFoldersAndToneStyles() {
         assertEquals("hello", notebook.search("ni3 hao3").single().id)
+        assertEquals("hello", notebook.search("ni3hao3").single().id)
         assertEquals("tea", notebook.search("茶").single().id)
         assertEquals("hello", notebook.search("HALO").single().id)
         assertEquals("Everyday / Greetings / Morning", notebook.breadcrumb("leaf"))
@@ -31,6 +32,8 @@ class NotebookTest {
         assertEquals(normalizeSearch("lü4"), normalizeSearch("lǜ"))
         assertEquals(normalizeSearch("lu:4"), normalizeSearch("lǜ"))
         assertEquals("ni", normalizeSearch("ni\u030c"))
+        assertEquals("lv", normalizeSearch("lu\u0308\u0300"))
+        assertEquals("2025", normalizeSearch("2025"))
     }
     @Test fun noteValidationRejectsEmptyAndOversizedInput() {
         assertFailsWith<IllegalArgumentException> { validateNote("", "ni", "Halo") }
