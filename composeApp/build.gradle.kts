@@ -19,6 +19,7 @@ kotlin {
             implementation("org.jetbrains.compose.foundation:foundation:1.11.1")
             implementation("org.jetbrains.compose.material:material:1.11.1")
             implementation("org.jetbrains.compose.ui:ui:1.11.1")
+            implementation(compose.components.resources)
             implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
             implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
         }
@@ -28,3 +29,4 @@ kotlin {
         }
     }
 }
+compose.resources { packageOfResClass = "com.kumalingo.resources" }
