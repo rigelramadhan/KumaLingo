@@ -18,3 +18,18 @@ jobs:
           node-version: '24'
       - run: npm --prefix webBridge ci --ignore-scripts
       - run: ./gradlew :shared:jvmTest :composeApp:wasmJsBrowserDistribution --no-daemon
+  worker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24'
+      - run: npm --prefix worker ci --ignore-scripts
+      - run: npm --prefix worker run typecheck
+      - run: npm --prefix worker test
+      - run: npm --prefix worker run build
+        env:
+          WRANGLER_SEND_METRICS: 'false'

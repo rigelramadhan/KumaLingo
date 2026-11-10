@@ -1,0 +1,13 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "kumalingo-api",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-11-10",
+  "workers_dev": true,
+  "vars": {
+    "FIREBASE_PROJECT_ID": "CONFIGURE_BEFORE_DEPLOYMENT",
+    "GOOGLE_WEB_CLIENT_ID": "CONFIGURE_BEFORE_DEPLOYMENT",
+    "ALLOWED_ORIGIN": "https://example.invalid",
+    "GEMINI_MODEL": "CONFIGURE_FREE_TIER_MODEL"
+  }
+}
