@@ -1,0 +1,8 @@
+[extend]
+useDefault = true
+
+[[rules]]
+id = "kumalingo-google-api-key"
+description = "Real Google API keys must not be published, including Firebase web keys"
+regex = '''AIza[0-9A-Za-z_-]{35}'''
+keywords = ["AIza"]

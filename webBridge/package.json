@@ -1,0 +1,14 @@
+{
+  "name": "@kumalingo/firebase-web",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Firebase web SDK setup for KumaLingo's Kotlin/Wasm adapter",
+  "exports": "./src/firebase.mjs",
+  "files": [
+    "src/firebase.mjs"
+  ],
+  "dependencies": {
+    "firebase": "13.2.0"
+  }
+}
