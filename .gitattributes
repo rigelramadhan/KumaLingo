@@ -1,2 +1,4 @@
 .githooks/* text eol=lf
 scripts/*.mjs text eol=lf
+gradlew text eol=lf
+*.bat text eol=crlf
