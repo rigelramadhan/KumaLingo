@@ -76,7 +76,8 @@ export function createHandler(dependencies: Dependencies = {}) {
           'delete-note': (body) => service.deleteNote(body),
           'move-note': (body) => service.moveNote(body),
         };
-        const action = actions[path.slice('/notebook/'.length)];
+        const actionName = path.slice('/notebook/'.length);
+        const action = Object.hasOwn(actions, actionName) ? actions[actionName] : undefined;
         if (action) return respond(await action(await readBody(request)));
       }
       throw new ApiError(404, 'not-found', 'This action could not be found.');

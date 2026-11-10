@@ -59,3 +59,12 @@ test('wrong origins, oversized bodies and internal exceptions reveal no private 
   assert.equal(failed.status, 503);
   assert.ok(!(await failed.text()).includes('synthetic-private-provider-detail'));
 });
+test('inherited object properties are never treated as notebook API actions', async () => {
+  const handle = createHandler({ store: () => ({ get: async () => ({ enabled: true }) } as unknown as Store), session: async () => identity });
+  for (const action of ['constructor', 'toString', '__proto__']) {
+    const response = await handle(new Request(`https://worker.invalid/notebook/${action}`, {
+      method: 'POST', headers: { Origin: env.ALLOWED_ORIGIN, 'X-KumaLingo-Client': 'web', Authorization: 'Bearer synthetic', 'Content-Type': 'application/json' }, body: '{}',
+    }), env);
+    assert.equal(response.status, 404);
+  }
+});

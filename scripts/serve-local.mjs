@@ -3,10 +3,10 @@
 import { createServer } from 'node:http';
 import { readFile, stat } from 'node:fs/promises';
 import { resolve, relative, extname } from 'node:path';
+import { validateRuntimeConfig } from '../webBridge/src/config.mjs';
 
 const root = resolve(import.meta.dirname, '..');
 const assets = resolve(root, 'composeApp/build/dist/wasmJs/productionExecutable');
-const publicFirebaseFields = new Set(['apiKey', 'authDomain', 'projectId', 'appId', 'measurementId', 'messagingSenderId', 'storageBucket']);
 const mime = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.wasm': 'application/wasm', '.json': 'application/json', '.ttf': 'font/ttf', '.txt': 'text/plain' };
 const server = createServer(async (request, response) => {
   response.setHeader('Cache-Control', 'no-store');
@@ -15,8 +15,7 @@ const server = createServer(async (request, response) => {
   try {
     const pathname = decodeURIComponent(new URL(request.url, 'http://localhost').pathname);
     if (pathname === '/config.json') {
-      const config = JSON.parse(await readFile(resolve(root, '.secrets/web-runtime.json'), 'utf8'));
-      if (!config.firebase || Object.keys(config).some((key) => !['firebase', 'apiBaseUrl', 'googleClientId'].includes(key)) || Object.keys(config.firebase).some((key) => !publicFirebaseFields.has(key) || typeof config.firebase[key] !== 'string')) throw new Error();
+      const config = validateRuntimeConfig(JSON.parse(await readFile(resolve(root, '.secrets/web-runtime.json'), 'utf8')));
       response.setHeader('Content-Type', 'application/json');
       response.end(JSON.stringify(config)); return;
     }

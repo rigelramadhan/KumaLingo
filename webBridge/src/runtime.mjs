@@ -1,6 +1,7 @@
 import { onAuthStateChanged, signInWithCustomToken, signOut } from 'firebase/auth';
 import { collection, doc, onSnapshot } from 'firebase/firestore';
 import { initializeFirebase } from './firebase.mjs';
+import { validateRuntimeConfig } from './config.mjs';
 
 let runtime;
 let callback = () => {};
@@ -106,12 +107,9 @@ export async function startRuntime(onEvent) {
   try {
     const response = await fetch('/config.json', { cache: 'no-store' });
     if (!response.ok || !response.headers.get('Content-Type')?.includes('application/json')) throw new Error();
-    const config = await response.json();
-    const base = new URL(config.apiBaseUrl);
-    if (base.username || base.password || base.search || base.hash || base.pathname !== '/' || (base.protocol !== 'https:' && !(base.protocol === 'http:' && ['localhost', '127.0.0.1'].includes(base.hostname)))) throw new Error();
-    if (typeof config.googleClientId !== 'string' || !config.googleClientId.endsWith('.apps.googleusercontent.com')) throw new Error();
+    const config = validateRuntimeConfig(await response.json());
     const firebase = initializeFirebase(config.firebase);
-    runtime = { ...firebase, apiBaseUrl: base.origin, googleClientId: config.googleClientId };
+    runtime = { ...firebase, apiBaseUrl: config.apiBaseUrl, googleClientId: config.googleClientId };
     onAuthStateChanged(runtime.auth, (user) => { void sessionChanged(user); });
   } catch { emit({ type: 'status', status: 'unconfigured' }); }
 }

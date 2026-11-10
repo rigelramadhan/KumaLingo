@@ -37,3 +37,4 @@ local.properties
 .tools/
 test-results/
 playwright-report/
+wrangler.local.jsonc

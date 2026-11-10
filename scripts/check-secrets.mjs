@@ -20,7 +20,7 @@ function git(args) {
 function checkPaths(paths) {
   for (const path of paths) {
     if (!path) continue;
-    if (/(^|\/)(?:node_modules|\.tools|\.secrets|credentials|secrets|\.wrangler)\/|(^|\/)(?:\.env(?:\..*)?|\.dev\.vars(?:\..*)?|web-config\.local\.json|config\.json)$|\.(?:pem|key|p12|pfx|jks|keystore)$/i.test(path)) {
+    if (/(^|\/)(?:node_modules|\.tools|\.secrets|credentials|secrets|\.wrangler)\/|(^|\/)(?:\.env(?:\..*)?|\.dev\.vars(?:\..*)?|web-config\.local\.json|wrangler\.local\.jsonc|config\.json)$|\.(?:pem|key|p12|pfx|jks|keystore)$/i.test(path)) {
       throw new Error(`Private/local artifact in publication set: ${path}`);
     }
     if (process.env.KUMA_ALLOW_DOCUMENTS !== '1' && (/(^|\/)(?:docs|deployment)\/|\.(?:md|rst|adoc|example)$/i.test(path))) {
