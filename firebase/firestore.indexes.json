@@ -1,0 +1,8 @@
+{
+  "indexes": [
+    {"collectionGroup":"folders","queryScope":"COLLECTION","fields":[{"fieldPath":"parentId","order":"ASCENDING"},{"fieldPath":"sortKey","order":"DESCENDING"}]},
+    {"collectionGroup":"notes","queryScope":"COLLECTION","fields":[{"fieldPath":"folderId","order":"ASCENDING"},{"fieldPath":"sortKey","order":"DESCENDING"}]},
+    {"collectionGroup":"folders","queryScope":"COLLECTION","fields":[{"fieldPath":"ancestorIds","arrayConfig":"CONTAINS"},{"fieldPath":"depth","order":"DESCENDING"}]}
+  ],
+  "fieldOverrides": []
+}

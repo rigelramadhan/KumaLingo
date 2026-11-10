@@ -1,0 +1,35 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function brokerIdentity() {
+      return request.auth != null
+        && request.auth.token.firebase.sign_in_provider == 'custom'
+        && request.auth.token.google_login == true
+        && request.auth.token.approved_email is string;
+    }
+    function invited() {
+      return brokerIdentity()
+        && exists(/databases/$(database)/documents/access/$(request.auth.token.approved_email))
+        && get(/databases/$(database)/documents/access/$(request.auth.token.approved_email)).data.enabled == true;
+    }
+    match /access/{email} {
+      allow get: if brokerIdentity() && email == request.auth.token.approved_email;
+      allow list, write: if false;
+    }
+    match /users/{uid}/folders/{id} {
+      allow read: if invited() && request.auth.uid == uid;
+      allow write: if false;
+    }
+    match /users/{uid}/notes/{id} {
+      allow read: if invited() && request.auth.uid == uid;
+      allow write: if false;
+    }
+    match /users/{uid}/operations/{id} {
+      allow read: if invited() && request.auth.uid == uid;
+      allow write: if false;
+    }
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

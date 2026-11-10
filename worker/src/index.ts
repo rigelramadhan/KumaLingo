@@ -2,6 +2,7 @@ import { checkAccess, mintCustomToken, verifyGoogle, verifySession } from './aut
 import { FirestoreStore } from './firestore.ts';
 import { ApiError } from './types.ts';
 import type { Env, Identity, Store } from './types.ts';
+import { NotebookService } from './notebook.ts';
 
 export interface Dependencies {
   store?: (env: Env) => Store;
@@ -61,6 +62,21 @@ export function createHandler(dependencies: Dependencies = {}) {
       const identity = await (dependencies.session ?? verifySession)(authorization.slice(7), env);
       await checkAccess(store, identity.email);
       if (request.method === 'GET' && path === '/session') return respond({ uid: identity.uid, email: identity.email });
+      if (request.method === 'POST' && path.startsWith('/notebook/')) {
+        const service = new NotebookService(store, identity);
+        const actions: Record<string, (body: Record<string, unknown>) => Promise<unknown>> = {
+          'create-folder': (body) => service.createFolder(body),
+          'rename-folder': (body) => service.renameFolder(body),
+          'delete-folder': (body) => service.deleteFolder(body),
+          'deletion-step': (body) => service.deletionStep(body),
+          'create-note': (body) => service.createNote(body),
+          'edit-note': (body) => service.editNote(body),
+          'delete-note': (body) => service.deleteNote(body),
+          'move-note': (body) => service.moveNote(body),
+        };
+        const action = actions[path.slice('/notebook/'.length)];
+        if (action) return respond(await action(await readBody(request)));
+      }
       throw new ApiError(404, 'not-found', 'This action could not be found.');
     } catch (error) {
       if (error instanceof ApiError) return respond({ error: { code: error.code, message: error.message } }, error.status);
