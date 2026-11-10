@@ -23,7 +23,8 @@ kotlin {
             implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
         }
         wasmJsMain.dependencies {
-            implementation(npm("@kumalingo/firebase-web", rootProject.file("webBridge")))
+            // Relative to build/wasm/packages/<module>; keep generated locks portable.
+            implementation(npm("@kumalingo/firebase-web", "file:../../../../webBridge"))
         }
     }
 }
